@@ -12,13 +12,14 @@ enum operation
     ex = 3
 };
 
-std::pair<std::string, std::vector<std::time_t>> begin_task(std::time_t&);
+std::pair<std::string, std::vector<std::time_t>> begin_task(std::time_t&, std::string&);
 
 int main()
 {
     std::map<std::string, std::vector<std::time_t>> list;
     int op;
     bool working = false;
+    std::string inWork = "";
     std::cout << "Time Management!" << std::endl;
     while (true)
     {
@@ -33,7 +34,7 @@ int main()
             {
                 working = true;
                 std::time_t a = std::time(nullptr);
-                list.insert(begin_task(a));
+                list.insert(begin_task(a, inWork));
                 
             }
             else
@@ -41,12 +42,13 @@ int main()
                 std::time_t b = std::time(nullptr);
                 std::map<std::string, std::vector<std::time_t>> ::iterator it = --list.end();
                 it->second.push_back(b);
-                list.insert(begin_task(b));
+                list.insert(begin_task(b, inWork));
             }
             break;
         case end:
             if (working)
             {
+                working = false;
                 std::time_t b = std::time(nullptr);
                 std::map<std::string, std::vector<std::time_t>> ::iterator it = --list.end();
                 
@@ -92,7 +94,7 @@ int main()
     
 }
 
-std::pair<std::string, std::vector<std::time_t>> begin_task(std::time_t& a)
+std::pair<std::string, std::vector<std::time_t>> begin_task(std::time_t& a, std::string& inWork)
 {
     
     std::vector<std::time_t> in;
@@ -100,6 +102,7 @@ std::pair<std::string, std::vector<std::time_t>> begin_task(std::time_t& a)
     std::string name;
     std::cout << "Enter task's name: " << std::endl;
     std::getline(std::cin, name);
+    inWork = name;
 
     return std::make_pair(name, in);
     
