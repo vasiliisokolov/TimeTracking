@@ -1,7 +1,6 @@
 ﻿#include <iostream>
 #include <ctime>
 #include <vector>
-#include <map>
 #include <string>
 
 enum operation
@@ -11,15 +10,24 @@ enum operation
     status = 2,
     ex = 3
 };
+struct task
+{
+    std::string name = "";
+    std::time_t start = std::time(nullptr);
+    std::time_t stop = std::time(nullptr);
+    
+};
 
-std::pair<std::string, std::vector<std::time_t>> begin_task(std::time_t&, std::string&);
+
+
+void begin_task(std::vector<task>&);
 
 int main()
 {
-    std::map<std::string, std::vector<std::time_t>> list;
+    std::vector<task> list;
     int op;
     bool working = false;
-    std::string inWork = "";
+    
     std::cout << "Time Management!" << std::endl;
     while (true)
     {
@@ -33,52 +41,41 @@ int main()
             if (!working)
             {
                 working = true;
-                std::time_t a = std::time(nullptr);
-                list.insert(begin_task(a, inWork));
+                begin_task(list);
                 
             }
             else
             {
-                std::time_t b = std::time(nullptr);
-                std::map<std::string, std::vector<std::time_t>> ::iterator it = --list.end();
-                it->second.push_back(b);
-                list.insert(begin_task(b, inWork));
+                list[list.size()-1].stop = std::time(nullptr);
+                begin_task(list);
             }
             break;
         case end:
             if (working)
             {
                 working = false;
-                std::time_t b = std::time(nullptr);
-                std::map<std::string, std::vector<std::time_t>> ::iterator it = --list.end();
-                
-                it->second.push_back(b);
+                list[list.size() - 1].stop = std::time(nullptr);
             }
             break;
         case status:
             
             if (working)
             {
-                int count = 1;
-                std::map<std::string, std::vector<std::time_t>> ::iterator it;
-                for (it = list.begin(); it != --list.end(); it++)
+                for (int i = 0; i < list.size() - 1; i++)
                 {
-                    std::cout << count << ". " << it->first << std::endl;
-                    std::cout << "Wasted time: " << std::difftime(it->second[0], it->second[1]) << std::endl;
-                    count++;
+                    std::cout << i+1 << ". " << list[i].name << std::endl;
+                    std::cout << "Wasted time: " << std::difftime(list[i].start, list[i].stop) << std::endl;
+                    
                 }
-                it = --list.end();
-                std::cout << "In progress: " << it->first << std::endl;
+                std::cout << "In progress: " << list[list.size()-1].name << std::endl;
             }
             else
             {
-                int count = 1;
-                std::map<std::string, std::vector<std::time_t>> ::iterator it;
-                for (it = list.begin(); it != list.end(); it++)
+                for (int i = 0; i < list.size(); i++)
                 {
-                    std::cout << count << ". " << it->first << std::endl;
-                    std::cout << "Wasted time: " << std::difftime(it->second[0], it->second[1]) << std::endl;
-                    count++;
+                    std::cout << i + 1 << ". " << list[i].name << std::endl;
+                    std::cout << "Wasted time: " << std::difftime(list[i].start, list[i].stop) << std::endl;
+
                 }
 
             }
@@ -94,16 +91,15 @@ int main()
     
 }
 
-std::pair<std::string, std::vector<std::time_t>> begin_task(std::time_t& a, std::string& inWork)
+void begin_task(std::vector<task>& list)
 {
     
-    std::vector<std::time_t> in;
-    in.push_back(a);
     std::string name;
     std::cout << "Enter task's name: " << std::endl;
     std::getline(std::cin, name);
-    inWork = name;
-
-    return std::make_pair(name, in);
+    task in;
+    in.name = name;
+    in.start = std::time(nullptr);
+    list.push_back(in);
     
 }
